@@ -38,9 +38,12 @@ def save_seen(seen):
 def scrape_kp(keyword):
     url = (
         "https://www.kupujemprodajem.com/pretraga"
-        f"?keywords={keyword.replace(' ', '+')}"
-        "&categoryId=161"   # Mobilni telefoni
-        "&sort=date_desc"
+        f"?keywords={keyword.replace(' ', '%20')}"
+        "&currency=eur"
+        "&condition=as-new"
+        "&condition=used"
+        "&period=3day"
+        "&ignoreUserId=no"
     )
     try:
         resp = requests.get(url, headers=HEADERS, timeout=15)
@@ -95,7 +98,7 @@ def is_phone(title):
     prompt = (
         "Oglas sa kupujemprodajem.com.\n"
         f"Naslov: {title}\n\n"
-        "Da li se radi o iPhone TELEFONU (ne masci, futroli, kablу, punjacu, "
+        "Da li se radi o iPhone TELEFONU (ne masci, futroli, kablu, punjacu, "
         "staklu za ekran, bateriji, ili drugoj opremi)?\n"
         "Odgovori SAMO rečju DA ili NE."
     )
