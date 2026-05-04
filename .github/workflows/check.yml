@@ -1,0 +1,40 @@
+name: KP iPhone Alert
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"   # svakih 15 minuta
+  workflow_dispatch:          # možeš i ručno da pokrneš
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write         # potrebno da bi mogao da commituje seen_ads.json
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instaliraj dependencies
+        run: pip install requests beautifulsoup4
+
+      - name: Pokreni scraper
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python scraper.py
+
+      - name: Sačuvaj seen_ads.json u repo
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add seen_ads.json
+          git diff --cached --quiet || git commit -m "update seen ads"
+          git push
